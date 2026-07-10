@@ -71,7 +71,8 @@ export default function CasesManagerPage() {
       if (!token) return;
 
       const response = await fetch('/api/reports', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
       });
       const data = await response.json();
       if (data.success) {
@@ -88,7 +89,8 @@ export default function CasesManagerPage() {
       if (!token) return;
 
       const response = await fetch('/api/users', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
       });
       const data = await response.json();
       if (data.success) {

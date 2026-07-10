@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getInquiries, addInquiry, addAuditLog } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 function validateSession(request: Request): string | null {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer session_')) {

@@ -52,13 +52,15 @@ export default function DashboardOverviewPage() {
 
         // Fetch reports
         const reportsRes = await fetch('/api/reports', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
         });
         const reportsData = await reportsRes.json();
 
         // Fetch audit logs
         const auditRes = await fetch('/api/audit', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store'
         });
         const auditData = await auditRes.json();
 

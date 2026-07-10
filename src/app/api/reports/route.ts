@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getReports, addReport, addAuditLog } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 // Helper to validate session
 function validateSession(request: Request): string | null {
   const authHeader = request.headers.get('Authorization');

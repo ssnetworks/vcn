@@ -47,7 +47,8 @@ export default function InquiriesInboxPage() {
     try {
       const token = localStorage.getItem('vcn_session_token');
       const response = await fetch('/api/inquiries', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
       });
       const data = await response.json();
       if (data.success) {

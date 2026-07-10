@@ -22,7 +22,8 @@ export default function ComplianceAuditPage() {
       if (!token) return;
 
       const response = await fetch('/api/audit', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store'
       });
       const data = await response.json();
       if (data.success) {
