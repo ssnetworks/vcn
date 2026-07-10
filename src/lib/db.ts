@@ -56,7 +56,14 @@ export interface DatabaseSchema {
   inquiries?: Inquiry[];
 }
 
-const DB_FILE_PATH = path.join(process.cwd(), 'vcn_database.json');
+// In-Memory cache fallback in case file system throws EROFS on serverless environments
+let memoryDbCache: DatabaseSchema | null = null;
+
+// Determine if we are running in a read-only environment like Vercel serverless functions
+const isVercel = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const DB_FILE_PATH = isVercel
+  ? path.join('/tmp', 'vcn_database.json')
+  : path.join(process.cwd(), 'vcn_database.json');
 
 // Simple hash function for passwords
 export function hashPassword(password: string): string {
@@ -222,6 +229,10 @@ const DEFAULT_INQUIRIES: Inquiry[] = [
 // Read from JSON file
 export function readDb(): DatabaseSchema {
   try {
+    if (memoryDbCache) {
+      return memoryDbCache;
+    }
+
     if (!fs.existsSync(DB_FILE_PATH)) {
       const db: DatabaseSchema = {
         reports: DEFAULT_REPORTS,
@@ -229,33 +240,42 @@ export function readDb(): DatabaseSchema {
         auditLogs: DEFAULT_AUDIT_LOGS,
         inquiries: DEFAULT_INQUIRIES,
       };
-      writeDb(db);
+      try {
+        fs.writeFileSync(DB_FILE_PATH, JSON.stringify(db, null, 2), 'utf-8');
+      } catch (writeErr) {
+        console.warn('Unable to write seed to file system, using memory cache:', writeErr);
+      }
+      memoryDbCache = db;
       return db;
     }
+
     const fileData = fs.readFileSync(DB_FILE_PATH, 'utf-8');
     const db: DatabaseSchema = JSON.parse(fileData);
     if (!db.inquiries) {
       db.inquiries = DEFAULT_INQUIRIES;
-      writeDb(db);
     }
+    memoryDbCache = db;
     return db;
   } catch (error) {
     console.error('Error reading JSON DB, using seeded default:', error);
-    return {
+    const fallbackDb = {
       reports: DEFAULT_REPORTS,
       users: DEFAULT_USERS,
       auditLogs: DEFAULT_AUDIT_LOGS,
       inquiries: DEFAULT_INQUIRIES,
     };
+    memoryDbCache = fallbackDb;
+    return fallbackDb;
   }
 }
 
 // Write to JSON file
 export function writeDb(db: DatabaseSchema): void {
+  memoryDbCache = db;
   try {
     fs.writeFileSync(DB_FILE_PATH, JSON.stringify(db, null, 2), 'utf-8');
   } catch (error) {
-    console.error('Error writing JSON DB:', error);
+    console.warn('Failed to write JSON DB to disk (expected on read-only environments). Using in-memory fallback:', error);
   }
 }
 
