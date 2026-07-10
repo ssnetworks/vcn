@@ -1,0 +1,17 @@
+{
+  "name": "Vigilant Cyber Ninjas",
+  "short_name": "VCN",
+  "description": "Ethical hackers dedicated to protecting women and children from cybercrime.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#00f0ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
